@@ -15,7 +15,7 @@ class ReviewCreate(ReviewBase):
 
 class ReviewUpdate(BaseModel):
     rating: Optional[float] = None 
-    description: Optional[str] = None
+    body: Optional[str] = None
 
 
 class Review(ReviewBase):
