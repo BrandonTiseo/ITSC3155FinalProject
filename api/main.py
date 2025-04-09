@@ -29,6 +29,7 @@ app.include_router(promotion.router)
 
 app.include_router(resources.router)
 
+
 if __name__ == "__main__":
     populate_data()
     print("Data population called")
