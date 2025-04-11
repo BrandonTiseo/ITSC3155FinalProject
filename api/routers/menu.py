@@ -5,8 +5,8 @@ from ..schemas import menu as schema
 from ..dependencies.database import get_db
 
 router = APIRouter(
-    prefix="/menu",
-    tags=["menu"],
+    prefix="/Menu",
+    tags=["Menu"],
 )
 
 @router.post("/", response_model=schema.MenuItem)
