@@ -8,5 +8,5 @@ class Customer(Base):
     email = Column(String(100), nullable=False)
     phone_number = Column(String(15), nullable=False)
     address = Column(String(255), nullable=False)
-    card_num = Column(Integer, nullable=False)
+    card_num = Column(String(20), nullable=False)
     card_type = Column(String(50), nullable=False)
