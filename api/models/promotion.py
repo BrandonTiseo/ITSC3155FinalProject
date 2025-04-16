@@ -7,4 +7,4 @@ class Promotion(Base):
     code = Column(String(100), nullable=False, unique=True)
     discount_percentage = Column(Float, nullable=False)
     description = Column(String(255), nullable=True)
-    is_active = Column(Integer, nullable=False, default=1)  # 1 for active, 0 for inactive
+    is_active = Column(Integer, nullable=False, default=0)  # 1 for active, 0 for inactive
