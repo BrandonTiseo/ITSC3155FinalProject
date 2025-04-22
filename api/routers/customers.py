@@ -26,7 +26,7 @@ def read_customer(name: str, db: Session = Depends(get_db)):
 
 @router.put("/{name}", response_model=schema.Customer)
 def update_customer(name: str, update_data: schema.CustomerUpdate, db: Session = Depends(get_db)):
-    return controller.update(db=db, name=name, update_data=update_data)
+    return controller.update(db=db, name=name, request=update_data)
 
 @router.delete("/{name}", response_model=schema.Customer)
 def delete_customer(name: str, db: Session = Depends(get_db)):

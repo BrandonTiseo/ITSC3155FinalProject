@@ -26,7 +26,7 @@ def read_menu_item(menu_item_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{menu_item_id}", response_model=schema.MenuItem)
 def update_menu_item(menu_item_id: int, menu_item: schema.MenuItemUpdate, db: Session = Depends(get_db)):
-    db_menu_item = controller.update(db=db, menu_item_id=menu_item_id, menu_item=menu_item)
+    db_menu_item = controller.update(db=db, menu_item_id=menu_item_id, request=menu_item)
     if db_menu_item is None:
         raise HTTPException(status_code=404, detail="Menu item not found")
     return db_menu_item

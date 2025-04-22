@@ -12,4 +12,4 @@ class Sandwich(Base):
     price = Column(DECIMAL(4, 2), nullable=False, server_default='0.0')
 
     recipes = relationship("Recipe", back_populates="sandwich")
-    order_details = relationship("OrderDetail", back_populates="sandwich")
+    #order_details = relationship("OrderDetail", back_populates="sandwich")
