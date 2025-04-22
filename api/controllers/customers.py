@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Response, Depends
 from ..models.customer import Customer
-from ..schemas.customer import CustomerCreate
+from ..schemas.customer import CustomerCreate, GuestCreate
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -44,3 +44,17 @@ def delete(db: Session, name: str):
     db.delete(customer)
     db.commit()
     return customer
+
+def create_guest(db: Session, guest: GuestCreate):
+    db_guest = Customer(**guest.model_dump())
+    db.add(db_guest)
+    db.commit()
+    db.refresh(db_guest)
+    return db_guest
+
+def delete_all_guests(db: Session):
+    guests = db.query(Customer).filter(Customer.is_guest == True).all()
+    for guest in guests:
+        db.delete(guest)
+    db.commit()
+    return {"message": f"Deleted {len(guests)} guest(s)"}
