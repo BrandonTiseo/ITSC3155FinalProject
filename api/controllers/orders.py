@@ -22,11 +22,11 @@ def create(db: Session, request):
 
 
         #create a new order detail for each item in the order
-        for sandwich_number, amount in zip(request.order_details, request.item_amounts):
-            print(f"making detail for {sandwich_number} Amount: {amount}")
+        for menu_item_number, amount in zip(request.order_details, request.item_amounts):
+            print(f"making detail for {menu_item_number} Amount: {amount}")
             detail = details_schema.OrderDetailCreate(
                 order_id = str(new_item.id),
-                sandwich_id = str(sandwich_number),
+                menu_item_id = str(menu_item_number),
                 amount = str(amount)
             )
             details_controller.create(db, detail)
