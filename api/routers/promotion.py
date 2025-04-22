@@ -17,17 +17,14 @@ def create_promotion(request: schema.PromotionCreate, db: Session = Depends(get_
 def read_all_promotions(db: Session = Depends(get_db)):
     return controller.read_all(db)
 
-@router.get("/{promotion_id}", response_model=schema.Promotion)
-def read_one_promotion(promotion_id: int, db: Session = Depends(get_db)):
-    promotion = controller.read_one(db, promotion_id)
-    if not promotion:
-        return Response(content="This promotion has expired.", status_code=status.HTTP_400_BAD_REQUEST)
-    return promotion
+@router.get("/{promotion_code}", response_model=schema.Promotion)
+def read_one_promotion(promotion_code: str, db: Session = Depends(get_db)):
+    return controller.read_one(db=db, promotion_code=promotion_code)
 
-@router.put("/{promotion_id}", response_model=schema.Promotion)
-def update_promotion(promotion_id: int, request: schema.PromotionUpdate, db: Session = Depends(get_db)):
-    return controller.update(db, promotion_id, request)
+@router.put("/{promotion_code}", response_model=schema.Promotion)
+def update_promotion(promotion_code: str, request: schema.PromotionUpdate, db: Session = Depends(get_db)):
+    return controller.update(db=db, promotion_code=promotion_code, request=request)
 
-@router.delete("/{promotion_id}", response_model=schema.Promotion)
-def delete_promotion(promotion_id: int, db: Session = Depends(get_db)):
-    return controller.delete(db, promotion_id)
+@router.delete("/{promotion_code}", response_model=schema.Promotion)
+def delete_promotion(promotion_code: str, db: Session = Depends(get_db)):
+    return controller.delete(db, promotion_code)

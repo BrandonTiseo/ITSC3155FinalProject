@@ -5,13 +5,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 def create(db: Session, request):
+    if db.query(model.Resource).filter(model.Resource.name == request.name).first() is not None:
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Resource with that name already exists!" )
     new_resource = model.Resource(
         name=request.name,
         amount=request.amount,
         unit=request.unit,
-
     )
-
     try:
         db.add(new_resource)
         db.commit()
@@ -35,8 +35,8 @@ def read_all(db: Session):
 def read_one(db: Session, resource_id):
     try:
         resource = db.query(model.Resource).filter(model.Resource.id == resource_id).first()
-        if not resource:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource ID not found!")
+        if resource is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource id not found!")
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
@@ -47,7 +47,7 @@ def update(db: Session, resource_id, request):
     try:
         resource = db.query(model.Resource).filter(model.Resource.id == resource_id)
         if not resource.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource ID not found!")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource id not found!")
         update_data = request.dict(exclude_unset=True)
         resource.update(update_data, synchronize_session=False)
         db.commit()
@@ -61,7 +61,7 @@ def delete(db: Session, resource_id):
     try:
         resource = db.query(model.Resource).filter(model.Resource.id == resource_id)
         if not resource.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource ID not found!")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource id not found!")
         resource.delete(synchronize_session=False)
         db.commit()
     except SQLAlchemyError as e:
