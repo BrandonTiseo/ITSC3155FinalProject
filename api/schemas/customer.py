@@ -22,3 +22,12 @@ class CustomerUpdate(BaseModel):
 class Customer(CustomerBase):
     class Config:
         orm_mode = True
+
+class GuestCreate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
+    card_num: str
+    card_type: str
+    is_guest: bool = True

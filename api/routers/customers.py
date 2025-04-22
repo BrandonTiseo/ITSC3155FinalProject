@@ -31,3 +31,11 @@ def update_customer(name: str, update_data: schema.CustomerUpdate, db: Session =
 @router.delete("/{name}", response_model=schema.Customer)
 def delete_customer(name: str, db: Session = Depends(get_db)):
     return controller.delete(db=db, name=name)
+
+@router.post("/guests/")
+def create_guest(guest: schema.GuestCreate, db: Session = Depends(get_db)):
+    return controller.create_guest(db=db, guest=guest)
+
+@router.delete("/guests/")
+def delete_guests(db: Session = Depends(get_db)):
+    return controller.delete_all_guests(db=db)

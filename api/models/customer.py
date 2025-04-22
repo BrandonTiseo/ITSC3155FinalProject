@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, Boolean
 from ..dependencies.database import Base
 
 class Customer(Base):
@@ -10,3 +10,4 @@ class Customer(Base):
     address = Column(String(255), nullable=False)
     card_num = Column(String(20), nullable=False)
     card_type = Column(String(50), nullable=False)
+    is_guest = Column(Boolean, default=False)
