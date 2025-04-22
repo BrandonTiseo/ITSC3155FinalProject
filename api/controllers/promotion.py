@@ -5,7 +5,9 @@ from ..schemas import promotion as schema
 from sqlalchemy.exc import SQLAlchemyError
 
 def create(db: Session, promotion: schema.PromotionCreate):
-    db_promotion = model.Promotion(**promotion.dict())
+    if db.query(model.Promotion).filter(model.Promotion.code == promotion.code).first() is not None:
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Promotion with that code already exists!" )
+    db_promotion = model.Promotion(**promotion.model_dump())
     db.add(db_promotion)
     db.commit()
     db.refresh(db_promotion)

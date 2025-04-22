@@ -5,13 +5,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 def create(db: Session, request):
+    if db.query(model.Resource).filter(model.Resource.name == request.name).first() is not None:
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Resource with that name already exists!" )
     new_resource = model.Resource(
         name=request.name,
         amount=request.amount,
         unit=request.unit,
-
     )
-
     try:
         db.add(new_resource)
         db.commit()

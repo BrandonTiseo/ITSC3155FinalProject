@@ -14,7 +14,7 @@ def create(db: Session, request):
         db.refresh(new_item)
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, details = error)
     
     return new_item
 
@@ -63,6 +63,6 @@ def delete(db: Session, item_id):
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_200_OK)
 
 
