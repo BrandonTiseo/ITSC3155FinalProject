@@ -19,7 +19,10 @@ def read_all_promotions(db: Session = Depends(get_db)):
 
 @router.get("/{promotion_id}", response_model=schema.Promotion)
 def read_one_promotion(promotion_id: int, db: Session = Depends(get_db)):
-    return controller.read_one(db, promotion_id)
+    promotion = controller.read_one(db, promotion_id)
+    if not promotion:
+        return Response(content="This promotion has expired.", status_code=status.HTTP_400_BAD_REQUEST)
+    return promotion
 
 @router.put("/{promotion_id}", response_model=schema.Promotion)
 def update_promotion(promotion_id: int, request: schema.PromotionUpdate, db: Session = Depends(get_db)):
