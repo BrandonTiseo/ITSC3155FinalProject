@@ -17,7 +17,7 @@ class PromotionUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 class Promotion(PromotionBase):
-    id: int
+    code: str
 
     class Config:
         orm_mode = True
