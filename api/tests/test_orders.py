@@ -4,6 +4,13 @@ from ..main import app
 import pytest
 from ..models import orders as model
 
+
+
+
+# Import the pytest-mock plugin
+pytest_plugins = ['pytest_mock']
+
+
 # Create a test client for the app
 client = TestClient(app)
 
