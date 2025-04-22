@@ -16,17 +16,18 @@ def create(db: Session, promotion: schema.PromotionCreate):
 def read_all(db: Session):
     return db.query(model.Promotion).all()
 
-def read_one(db: Session, promotion_id: int):
-    promotion = db.query(model.Promotion).filter(model.Promotion.id == promotion_id).first()
+def read_one(db: Session, promotion_code: str):
+    promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
     if promotion is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion id not found!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
     return promotion
 
-def update(db: Session, promotion_id, request):
+
+def update(db: Session, promotion_code, request):
     try:
-        promotion = db.query(model.Promotion).filter(model.Promotion.id == promotion_id)
+        promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code)
         if not promotion.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion id not found!")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
         update_data = request.dict(exclude_unset=True)
         promotion.update(update_data, synchronize_session=False)
         db.commit()
@@ -36,10 +37,10 @@ def update(db: Session, promotion_id, request):
     return promotion.first()
 
 
-def delete(db: Session, promotion_id: int):
-    promotion = db.query(model.Promotion).filter(model.Promotion.id == promotion_id).first()
+def delete(db: Session, promotion_code: str):
+    promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
     if promotion is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion id not found!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
     db.delete(promotion)
     db.commit()
     return promotion
