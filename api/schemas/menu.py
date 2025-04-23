@@ -1,25 +1,26 @@
 from pydantic import BaseModel
 from typing import Optional
+from .recipes import Recipe
 
 class MenuItemBase(BaseModel):
     name: str
-    ingredients: str
     price: float
     calories: int
     category: str
 
 class MenuItemCreate(MenuItemBase):
-    pass
+    recipe_items:list[int] = None
+    recipe_amounts: list[int] = None
 
 class MenuItemUpdate(BaseModel):
     name: Optional[str] = None
-    ingredients: Optional[str] = None
     price: Optional[float] = None
     calories: Optional[int] = None
     category: Optional[str] = None
 
 class MenuItem(MenuItemBase):
     id: int
-
-    class Config:
-        orm_mode = True
+    recipe_items: list[Recipe] = None
+    
+    class ConfigDict:
+        from_attributes = True
