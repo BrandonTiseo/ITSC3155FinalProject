@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DATETIME
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..dependencies.database import Base
+from sqlalchemy import UniqueConstraint
 
 
 class Recipe(Base):
@@ -14,3 +15,7 @@ class Recipe(Base):
 
     menu_item = relationship("MenuItem", back_populates="recipe_items")
     resource = relationship("Resource", back_populates="recipes")
+    
+    __table_args__ = (
+    UniqueConstraint('menu_item_id', 'resource_id', name='uix_menu_resource'),
+    )
