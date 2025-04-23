@@ -11,7 +11,7 @@ router = APIRouter(
 
 @router.post("/", response_model=schema.MenuItem)
 def create_menu_item(menu_item: schema.MenuItemCreate, db: Session = Depends(get_db)):
-    return controller.create(db=db, menu_item=menu_item)
+    return controller.create(db=db, request=menu_item)
 
 @router.get("/", response_model=list[schema.MenuItem])
 def read_all_menu_items(db: Session = Depends(get_db)):

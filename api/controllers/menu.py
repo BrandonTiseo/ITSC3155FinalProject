@@ -4,15 +4,49 @@ from ..models.menu import MenuItem
 from ..schemas.menu import MenuItemCreate
 from sqlalchemy.exc import SQLAlchemyError
 
+from ..controllers import recipes as recipe_controller
+from ..schemas import recipes as recipe_schema
 
-def create(db: Session, menu_item: MenuItemCreate):
-    if db.query(MenuItem).filter(MenuItem.name == menu_item.name).first() is not None:
-        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Menu item with that name already exists!")
-    db_menu_item = MenuItem(**menu_item.model_dump())
-    db.add(db_menu_item)
-    db.commit()
-    db.refresh(db_menu_item)
-    return db_menu_item
+# def create(db: Session, menu_item: MenuItemCreate):
+#     if db.query(MenuItem).filter(MenuItem.name == menu_item.name).first() is not None:
+#         raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Menu item with that name already exists!")
+#     db_menu_item = MenuItem(**menu_item.model_dump())
+#     db.add(db_menu_item)
+#     db.commit()
+#     db.refresh(db_menu_item)
+#     return db_menu_item
+
+
+def create(db: Session, request):
+    if db.query(MenuItem).filter(MenuItem.name == request.name).first() is not None:
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Menu Item with that name already exists!" )
+    new_menu_item = MenuItem(
+        name = request.name,
+        price = request.price,
+        calories = request.calories,
+        category = request.category
+    )
+
+    try:
+        db.add(new_menu_item)
+        db.commit()
+        db.refresh(new_menu_item)
+
+
+        for resource_item_number, resource_amount in zip(request.recipe_items, request.recipe_amounts):
+            recipe = recipe_schema.RecipeCreate(
+                menu_item_id = str(new_menu_item.id),
+                resource_id = str(resource_item_number),
+                amount = str(resource_amount)
+            )
+            recipe_controller.create(db, recipe)
+            
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
+    
+    return new_menu_item
+
 
 def read_all(db: Session):
     return db.query(MenuItem).all()
