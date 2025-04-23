@@ -75,7 +75,7 @@ def delete_by_menu_item(db: Session, menu_item_id):
     try:
         recipe = db.query(model.Recipe).filter(model.Recipe.menu_item_id == menu_item_id)
         if not recipe.first():
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="OrderDetail: Id not found!")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="MenuItem: Id not found!")
         
         recipe.delete(synchronize_session=False)
         db.commit()
