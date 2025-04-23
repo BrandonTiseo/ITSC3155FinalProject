@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
 from ..dependencies.database import Base
+from datetime import datetime
 
 class Promotion(Base):
     __tablename__ = "promotions"
@@ -7,3 +8,12 @@ class Promotion(Base):
     discount_percentage = Column(Float, nullable=False)
     description = Column(String(255), nullable=True)
     is_active = Column(Boolean)
+    expiration = Column(DateTime(timezone=True), nullable=False)  # expiration date 
+
+
+    # Automatically check if promotion is expired when querying the promotion
+    def check_expiration(self):
+        if self.expiration and self.expiration < datetime.utcnow():
+            self.is_active = false
+            return False
+        return True

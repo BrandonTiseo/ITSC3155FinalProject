@@ -13,6 +13,7 @@ class CustomerCreate(CustomerBase):
     pass
 
 class CustomerUpdate(BaseModel):
+    name: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
     address: Optional[str] = None
@@ -20,5 +21,14 @@ class CustomerUpdate(BaseModel):
     card_type: Optional[str] = None
 
 class Customer(CustomerBase):
+    id: int
     class Config:
         orm_mode = True
+
+class GuestCreate(BaseModel):
+    name: Optional[str] = "Guest"
+    email: Optional[str] = ""
+    phone_number: Optional[str] = ""
+    address: Optional[str] = ""
+    card_num: str
+    card_type: str

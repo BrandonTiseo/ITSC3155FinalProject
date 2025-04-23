@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+
+from datetime import datetime, timezone
 from fastapi import HTTPException, status, Response
 from ..models import promotion as model
 from ..schemas import promotion as schema
@@ -14,14 +16,18 @@ def create(db: Session, promotion: schema.PromotionCreate):
     return db_promotion
 
 def read_all(db: Session):
-    return db.query(model.Promotion).all()
+    promotions = db.query(model.Promotion).all()
+     # Check if promotions are expired and update is_active
+    for promotion in promotions:
+        promotion.check_expiration()
+    return promotions
+
 
 def read_one(db: Session, promotion_code: str):
-    promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
-    if promotion is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
-    return promotion
-
+    db_promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
+    if db_promotion and not db_promotion.check_expiration():
+        return None  # Expired promotion
+    return db_promotion
 
 def update(db: Session, promotion_code, request):
     try:
@@ -30,6 +36,8 @@ def update(db: Session, promotion_code, request):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
         update_data = request.dict(exclude_unset=True)
         promotion.update(update_data, synchronize_session=False)
+        if db_promotion.expiration and db_promotion.expiration < datetime.now(timezone.utc):
+            db_promotion.is_active = 0
         db.commit()
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])

@@ -1,0 +1,72 @@
+from sqlalchemy.orm import Session
+from ..models.orders import Order as OrderModel
+from ..models.order_details import OrderDetail as OrderDetailModel
+from ..models.menu import MenuItem as MenuItemModel
+from ..models.promotion import Promotion as PromotionModel
+from ..models.customers import Customer as CustomerModel
+from ..models.resources import Resource as ResourceModel
+from ..dependencies.database import engine
+
+def populate_data():
+    session = Session(bind=engine)
+
+    # Clear existing data
+    session.query(OrderModel).delete()
+    session.query(OrderDetailModel).delete()
+    session.query(GuestOrderModel).delete()
+    session.query(MenuItemModel).delete()
+    session.query(FeedbackModel).delete()
+    session.query(PromotionModel).delete()
+    session.query(CustomerModel).delete()
+    session.query(PaymentModel).delete()
+    session.query(ResourceModel).delete()
+
+    # Sample data
+    orders = [
+        OrderModel(customer_name="John Doe", description="First order"),
+        OrderModel(customer_name="Jane Kathrin", description="Second order"),
+        OrderModel(customer_name="Alice Williams", description="Third order")
+    ]
+
+    order_details = [
+        OrderDetailModel(order_id=1, sandwich_id=1, amount=2),
+        OrderDetailModel(order_id=2, sandwich_id=2, amount=1),
+        OrderDetailModel(order_id=3, sandwich_id=3, amount=3)
+    ]
+
+ 
+    menu_items = [
+        MenuItemModel(name="Ham Sandwich", ingredients="Ham, Bread, Lettuce", price=5.99, calories=250, category="Sandwich"),
+        MenuItemModel(name="Cheese Sandwich", ingredients="Cheese, Bread, Tomato", price=4.99, calories=200, category="Sandwich")
+    ]
+
+
+    promotions = [
+        PromotionModel(code="HOLIDAY20", discount_percentage=20.0, description="Holiday Discount", is_active=1),
+        PromotionModel(code="LOYALTY10", discount_percentage=10.0, description="Loyalty Program", is_active=1)
+    ]
+
+    customers = [
+        CustomerModel(name="John Doe", email="john.doe@example.com", phone="123-456-7890", address="901 Main St"),
+        CustomerModel(name="Jane Kathrin", email="jane.smith@example.com", phone="987-654-3210", address="568 walt St")
+    ]
+
+
+    resources = [
+        ResourceModel(name="Bread", amount=100.0, unit="kg"),
+        ResourceModel(name="Cheese", amount=50.0, unit="kg")
+    ]
+
+    # Insert data
+    session.add_all(orders)
+    session.add_all(order_details)
+    session.add_all(menu_items)
+    session.add_all(promotions)
+    session.add_all(customers)
+    session.add_all(resources)
+    session.commit()
+    session.close()
+    print("Data population complete")
+
+if __name__ == "__main__":
+    populate_data()
