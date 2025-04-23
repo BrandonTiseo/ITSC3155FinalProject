@@ -71,6 +71,10 @@ def update(db: Session, menu_item_id, request):
     return menu_item.first()
 
 def delete(db: Session, menu_item_id: int):
+    
+    #Delete all recipe items first.
+    recipe_controller.delete_by_menu_item(db, menu_item_id)
+    
     menu_item = db.query(MenuItem).filter(MenuItem.id == menu_item_id).first()
     if menu_item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Menu item id not found!")
