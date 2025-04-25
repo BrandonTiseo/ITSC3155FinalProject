@@ -1,11 +1,14 @@
 from sqlalchemy.orm import Session
+import datetime
 from fastapi import HTTPException, status, Response, Depends
 from ..models import orders as model
+from ..schemas import orders as schema
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..controllers import order_details as details_controller
 from ..schemas import order_details as details_schema
 from ..models import order_details as details_model
+from ..models import menu as menu_model
 
 
 def create(db: Session, request):
@@ -14,8 +17,11 @@ def create(db: Session, request):
         description=request.description,
         status=request.status,
         type=request.type,
+
         order_date=datetime.datetime.now(),
         promotion_code=request.promotion_code 
+        order_date=datetime.datetime.now()
+
     )
 
     try:
@@ -24,8 +30,9 @@ def create(db: Session, request):
         db.refresh(new_item)
 
 
-        #create a new order detail for each item in the order
+        order_price = 0
         for menu_item_number, amount in zip(request.order_details, request.item_amounts):
+            #create a new order detail for each item in the order
             print(f"making detail for {menu_item_number} Amount: {amount}")
             detail = details_schema.OrderDetailCreate(
                 order_id = str(new_item.id),
@@ -82,6 +89,14 @@ def read_all(db: Session):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return result
 
+def read_by_date(db: Session, startDate: str, endDate: str):
+    try:
+        result = db.query(model.Order).filter(model.Order.order_date < endDate).filter(model.Order.order_date > startDate)
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
+    return result
+
 
 def read_one(db: Session, item_id):
     try:
@@ -106,6 +121,25 @@ def update(db: Session, item_id, request):
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return item.first()
+
+def update_status(db: Session, item_id: int, new_status: str):
+    update_object = schema.OrderUpdate(
+        status=new_status
+    )
+
+    if new_status == "Elevate":
+        order = db.query(model.Order).filter(model.Order.id == item_id).first()
+        old_status = order.status
+
+        match(old_status):
+            case "Received":
+                update_object = schema.OrderUpdate(status="Finished")
+            case "Finished":
+                update_object = schema.OrderUpdate(status="Served")
+
+    
+    return update(db, item_id, update_object)
+
 
 
 
