@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DATETIME
 from sqlalchemy.orm import relationship
+from ..models.promotion import Promotion
 from datetime import datetime
 from ..dependencies.database import Base
 
@@ -15,7 +16,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     customer_name = Column(String(100)) #ForeignKey(customers.name)
-    order_date = Column(DATETIME, nullable=False, server_default=str(datetime.now()))
+    order_date = Column(DateTime, nullable=False, server_default=str(datetime.now()))
     description = Column(String(300))
     status = Column(String(50))
 

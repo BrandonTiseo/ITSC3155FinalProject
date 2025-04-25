@@ -12,7 +12,10 @@ def create(db: Session, request):
     new_item = model.Order(
         customer_name=request.customer_name,
         description=request.description,
-        status=request.status
+        status=request.status,
+        type=request.type,
+        order_date=datetime.datetime.now(),
+        promotion_code=request.promotion_code 
     )
 
     try:
@@ -31,6 +34,16 @@ def create(db: Session, request):
             )
             details_controller.create(db, detail)
 
+            #sum up the price of each order detail
+            result = db.query(menu_model.MenuItem).filter(menu_model.MenuItem.id == menu_item_number).first()
+            order_price += result.price * amount
+
+        #update the order object with the total price of all the items
+        update_price = schema.OrderUpdate(
+            totalPrice=order_price
+        )
+        update(db, new_item.id, update_price)
+
 
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
@@ -38,6 +51,28 @@ def create(db: Session, request):
     
     return new_item
 
+# Method to apply promotion to an order
+def apply_promotion(db: Session, order_id: int, promotion_code: str, order_price: float):
+    try:
+        # Fetch the promotion based on the provided code
+        promo = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
+
+        if not promo:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion not found!")
+
+        # Check if the promotion is active and valid
+        if not promo.is_active or not promo.check_expiration():
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Promotion is expired or inactive!")
+
+        # Apply the discount to the order price
+        discount = promo.discount_percent / 100  # Assuming the discount is stored as a percentage
+        order_price *= (1 - discount)
+
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
+
+    return order_price
 
 def read_all(db: Session):
     try:

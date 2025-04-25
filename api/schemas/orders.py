@@ -9,7 +9,7 @@ class OrderBase(BaseModel):
     customer_name: str
     description: Optional[str] = None
     status: str
-    
+    promotion_code: Optional[str] = None
 
 
 class OrderCreate(OrderBase):
