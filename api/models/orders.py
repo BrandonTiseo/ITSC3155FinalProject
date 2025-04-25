@@ -1,6 +1,7 @@
 import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, Float, DateTime
 from sqlalchemy.orm import relationship
+from ..models.promotion import Promotion
 from datetime import datetime
 from ..dependencies.database import Base
 
