@@ -23,7 +23,7 @@ class CustomerUpdate(BaseModel):
 class Customer(CustomerBase):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class GuestCreate(BaseModel):
     name: Optional[str] = "Guest"

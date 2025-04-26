@@ -10,5 +10,5 @@ class MenuItem(Base):
     calories = Column(Integer, nullable=False)
     category = Column(String(50), nullable=False) 
     
-    order_details = relationship("OrderDetail", back_populates="menu_item")
-    recipe_items = relationship("Recipe", back_populates="menu_item", uselist=True, cascade='all,delete')
+    order_details = relationship("OrderDetail", back_populates="menu_item", cascade="all, delete-orphan")
+    recipe_items = relationship("Recipe", back_populates="menu_item", uselist=True, cascade="all, delete-orphan")

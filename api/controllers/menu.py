@@ -71,8 +71,6 @@ def update(db: Session, menu_item_id, request):
     return menu_item.first()
 
 def delete(db: Session, menu_item_id: int):
-    
-    #Delete all recipe items first.
     recipe_controller.delete_by_menu_item(db, menu_item_id)
     
     menu_item = db.query(MenuItem).filter(MenuItem.id == menu_item_id).first()
@@ -81,3 +79,11 @@ def delete(db: Session, menu_item_id: int):
     db.delete(menu_item)
     db.commit()
     return menu_item
+
+def search_by_category(db: Session, category: str):
+    search_result = db.query(MenuItem).filter(MenuItem.category.ilike(f"%{category}%")).all()
+    
+    if not search_result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No menu items found for this category.")
+    
+    return search_result
