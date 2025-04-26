@@ -5,14 +5,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 def create(db: Session, request):
-    print("In recipe creation!")
-    print(request)
     new_recipe = model.Recipe(
         menu_item_id=request.menu_item_id,
         resource_id = request.resource_id,
         amount=request.amount
     )
-    print(new_recipe)
     try:
         db.add(new_recipe)
         db.commit()
@@ -72,6 +69,7 @@ def delete(db: Session, recipe_id):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 def delete_by_menu_item(db: Session, menu_item_id):
+    #Removes all recipes generated for a singular menu_item. Used when deleting a menu_item.
     try:
         recipe = db.query(model.Recipe).filter(model.Recipe.menu_item_id == menu_item_id)
         if not recipe.first():

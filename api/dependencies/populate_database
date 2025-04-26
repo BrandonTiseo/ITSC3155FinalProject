@@ -3,7 +3,7 @@ from ..models.orders import Order as OrderModel
 from ..models.order_details import OrderDetail as OrderDetailModel
 from ..models.menu import MenuItem as MenuItemModel
 from ..models.promotion import Promotion as PromotionModel
-from ..models.customers import Customer as CustomerModel
+from ..models.customer import Customer as CustomerModel
 from ..models.resources import Resource as ResourceModel
 from ..dependencies.database import engine
 
@@ -13,12 +13,12 @@ def populate_data():
     # Clear existing data
     session.query(OrderModel).delete()
     session.query(OrderDetailModel).delete()
-    session.query(GuestOrderModel).delete()
+    #session.query(GuestOrderModel).delete()
     session.query(MenuItemModel).delete()
-    session.query(FeedbackModel).delete()
+    #session.query(FeedbackModel).delete()
     session.query(PromotionModel).delete()
     session.query(CustomerModel).delete()
-    session.query(PaymentModel).delete()
+    #session.query(PaymentModel).delete()
     session.query(ResourceModel).delete()
 
     # Sample data
