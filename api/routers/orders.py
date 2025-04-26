@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, FastAPI, status, Response
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from ..controllers import orders as controller
 from ..schemas import orders as schema
+from ..models import orders as order_model
 from ..dependencies.database import engine, get_db
 from ..controllers.orders import apply_promotion
 
@@ -32,7 +33,7 @@ def read_one(item_id: int, db: Session = Depends(get_db)):
 @router.put("/apply-promotion/{order_id}")
 def apply_promotion_to_order(order_id: int, promotion_code: str, db: Session = Depends(get_db)):
     # Get the order to check if it exists
-    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    order = db.query(order_model.Order).filter(order_model.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
 
