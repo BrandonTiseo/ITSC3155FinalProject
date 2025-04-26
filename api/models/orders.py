@@ -24,6 +24,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     customer_name = Column(String(100)) #ForeignKey(customers.name)
+    promotion_code = Column(String(100), ForeignKey("promotions.code"))
     order_date = Column(DateTime, nullable=False, server_default=str(datetime.now()))
     description = Column(String(300))
     status = Column(String(50))
@@ -32,6 +33,7 @@ class Order(Base):
 
 
     order_details = relationship("OrderDetail", back_populates="order", uselist=True, cascade='all,delete')
+    promotion= relationship("Promotion", back_populates="orders")
 
 
 """

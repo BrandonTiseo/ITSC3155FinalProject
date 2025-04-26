@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select, join
 import datetime
 from fastapi import HTTPException, status, Response, Depends
 from ..models import orders as model
@@ -9,17 +10,58 @@ from ..controllers import order_details as details_controller
 from ..schemas import order_details as details_schema
 from ..models import order_details as details_model
 from ..models import menu as menu_model
+from ..models import recipes as recipe_model
+from ..models import resources as resource_model
 
 
 def create(db: Session, request):
+    #Checking for sufficient ingredients
+    requested_resources = {}
+    checked_menu_items = []
+    for requested_menu_item, requested_menu_item_amount in zip(request.order_details, request.item_amounts):
+        #check if requested menu_item has already been checked
+        if requested_menu_item in checked_menu_items:
+            continue
+        
+        #Query 1, retrieve the needed amount for each recipe item.
+        stm1 = (
+            select(recipe_model.Recipe.amount)
+            .where(recipe_model.Recipe.menu_item_id == requested_menu_item)
+            .distinct())
+        #Query 2, retrieve the id's and amounts for each resource needed.
+        stmt2 = (
+            select(resource_model.Resource.id, resource_model.Resource.amount)
+            .select_from(recipe_model.Recipe)
+            .where(recipe_model.Recipe.menu_item_id == requested_menu_item)
+            .distinct()
+        )
+        needed_recipe_amounts = db.execute(stm1).all()
+        resources = db.execute(stmt2).all()
+        for amount, needed_resource in zip(needed_recipe_amounts, resources):
+            #Check if the current resource has been checked previously.
+            if(needed_resource[0] in requested_resources):
+                requested_resources[needed_resource[0]] += amount[0] * requested_menu_item_amount
+            else:
+                requested_resources[needed_resource[0]] = amount[0] * requested_menu_item_amount
+            
+            #Check if we have enough of that resource for the order.
+            if(requested_resources[needed_resource[0]] > needed_resource[1]):  
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= f"Not enough of resource id {needed_resource[0]} for this order!")
+            else:
+                #Update resource amounts accordingly.
+                resource_to_update = db.query(model.Order).filter(resource_model.Resource.id == needed_resource[0])
+                resource_to_update.update({resource_model.Resource.amount: resource_model.Resource.amount - requested_resources[needed_resource[0]]}, synchronize_session=False)
+    db.commit()
+
+
     new_item = model.Order(
         customer_name=request.customer_name,
         description=request.description,
         status=request.status,
         type=request.type,
 
-        order_date=datetime.datetime.now(),
-        promotion_code=request.promotion_code 
+        #order_date=datetime.datetime.now(),
+        promotion_code=request.promotion_code,
         order_date=datetime.datetime.now()
 
     )
