@@ -31,18 +31,23 @@ def read_one(db: Session, promotion_code: str):
 
 def update(db: Session, promotion_code, request):
     try:
-        promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code)
-        if not promotion.first():
+        db_promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
+        if not db_promotion:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Promotion code not found!")
         update_data = request.dict(exclude_unset=True)
-        promotion.update(update_data, synchronize_session=False)
+        for key, value in update_data.items():
+            setattr(db_promotion, key, value)
+
+
         if db_promotion.expiration and db_promotion.expiration < datetime.now(timezone.utc):
-            db_promotion.is_active = 0
+            db_promotion.is_active = False
+
         db.commit()
+        db.refresh(db_promotion)
+        return db_promotion
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
-    return promotion.first()
 
 
 def delete(db: Session, promotion_code: str):
