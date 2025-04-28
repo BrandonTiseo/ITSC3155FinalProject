@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, FastAPI, status, Response
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from ..controllers import orders as controller
 from ..schemas import orders as schema
+from ..models import orders as order_model
 from ..dependencies.database import engine, get_db
 from ..controllers.orders import apply_promotion
 
@@ -32,19 +33,18 @@ def read_one(item_id: int, db: Session = Depends(get_db)):
 @router.put("/apply-promotion/{order_id}")
 def apply_promotion_to_order(order_id: int, promotion_code: str, db: Session = Depends(get_db)):
     # Get the order to check if it exists
-    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    order = db.query(order_model.Order).filter(order_model.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
 
-    # Apply promotion to the order price
-    updated_price = apply_promotion(db, order_id, promotion_code, order.totalPrice)
+    # Check if the promotion code exists
+    promotion = db.query(order_model.Promotion).filter(order_model.Promotion.code == promotion_code).first()
+    if not promotion or not promotion.check_expiration():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired promotion code")
 
-    # Update the order with the new price
-    order.totalPrice = updated_price
-    db.commit()
-    db.refresh(order)
+    # No price update, just confirm that the promotion was successfully applied
+    return {"message": "Promotion applied successfully", "promotion_code": promotion_code}
 
-    return {"message": "Promotion applied successfully", "new_total_price": updated_price}
 
 @router.put("/{item_id}", response_model=schema.Order)
 def update(item_id: int, request: schema.OrderUpdate, db: Session = Depends(get_db)):

@@ -24,7 +24,6 @@ class OrderBase(BaseModel):
     customer_name: str
     description: Optional[str] = None
     status: str
-    promotion_code: Optional[str] = None
     customer_name: str = "Scoobert G. Boinkus"
     description: Optional[str] = "No customer modifications"
     status: Optional[str] = "Received"

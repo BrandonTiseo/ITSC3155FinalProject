@@ -7,16 +7,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..controllers import recipes as recipe_controller
 from ..schemas import recipes as recipe_schema
 
-# def create(db: Session, menu_item: MenuItemCreate):
-#     if db.query(MenuItem).filter(MenuItem.name == menu_item.name).first() is not None:
-#         raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Menu item with that name already exists!")
-#     db_menu_item = MenuItem(**menu_item.model_dump())
-#     db.add(db_menu_item)
-#     db.commit()
-#     db.refresh(db_menu_item)
-#     return db_menu_item
-
-
 def create(db: Session, request):
     if db.query(MenuItem).filter(MenuItem.name == request.name).first() is not None:
         raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="Menu Item with that name already exists!" )

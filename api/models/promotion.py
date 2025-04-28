@@ -17,6 +17,6 @@ class Promotion(Base):
     # Automatically check if promotion is expired when querying the promotion
     def check_expiration(self):
         if self.expiration and self.expiration < datetime.utcnow():
-            self.is_active = false
+            self.is_active = False
             return False
         return True
