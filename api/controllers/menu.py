@@ -86,4 +86,4 @@ def search_by_category(db: Session, category: str):
     if not search_result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No menu items found for this category.")
     
-    return search_result  
+    return search_result
