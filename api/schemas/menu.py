@@ -22,5 +22,5 @@ class MenuItem(MenuItemBase):
     id: int
     recipe_items: list[Recipe] = None
     
-    class ConfigDict:
+    class Config:
         from_attributes = True
