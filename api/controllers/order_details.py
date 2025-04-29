@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status, Response, Depends
+from fastapi import HTTPException, status, Response
 from ..models import order_details as model
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -68,6 +68,7 @@ def delete(db: Session, item_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 def delete_by_order(db: Session, order_id):
     try:

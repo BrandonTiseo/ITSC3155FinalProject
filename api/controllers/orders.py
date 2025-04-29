@@ -1,14 +1,13 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, join
+from sqlalchemy import select
 import datetime
-from fastapi import HTTPException, status, Response, Depends
+from fastapi import HTTPException, status, Response
 from ..models import orders as model
 from ..schemas import orders as schema
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..controllers import order_details as details_controller
 from ..schemas import order_details as details_schema
-from ..models import order_details as details_model
 from ..models import menu as menu_model
 from ..models import recipes as recipe_model
 from ..models import resources as resource_model
@@ -102,7 +101,6 @@ def create(db: Session, request):
     return new_item
 
 
-
 def read_all(db: Session):
     try:
         result = db.query(model.Order).all()
@@ -110,6 +108,7 @@ def read_all(db: Session):
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return result
+
 
 def read_by_date(db: Session, startDate: str, endDate: str):
     try:

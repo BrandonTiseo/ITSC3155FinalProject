@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status, Response, Depends
+from fastapi import HTTPException, status, Response
 from ..models import recipes as model
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -67,6 +67,7 @@ def delete(db: Session, recipe_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 def delete_by_menu_item(db: Session, menu_item_id):
     #Removes all recipes generated for a singular menu_item. Used when deleting a menu_item.
