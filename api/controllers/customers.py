@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status, Response, Depends
+from fastapi import HTTPException, status
 from ..models.customer import Customer
 from ..schemas.customer import CustomerCreate, GuestCreate
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,8 +12,10 @@ def create(db: Session, customer: CustomerCreate):
     db.refresh(db_customer)
     return db_customer
 
+
 def read_all(db: Session):
     return db.query(Customer).all()
+
 
 def read_one(db: Session, id: int):
     customer = db.query(Customer).filter(Customer.id == id).first()
@@ -37,6 +39,7 @@ def update(db: Session, id: int, request):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return customer.first()
 
+
 def delete(db: Session, id: int):
     customer = db.query(Customer).filter(Customer.id == id).first()
     if customer is None:
@@ -45,6 +48,7 @@ def delete(db: Session, id: int):
     db.commit()
     return customer
 
+
 def create_guest(db: Session, guest: GuestCreate):
     db_guest = Customer(**guest.model_dump())
     db_guest.is_guest = True
@@ -52,6 +56,7 @@ def create_guest(db: Session, guest: GuestCreate):
     db.commit()
     db.refresh(db_guest)
     return db_guest
+
 
 def delete_all_guests(db: Session):
     guests = db.query(Customer).filter(Customer.is_guest == True).all()

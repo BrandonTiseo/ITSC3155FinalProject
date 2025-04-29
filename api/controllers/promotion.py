@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 
 from datetime import datetime, timezone
-from fastapi import HTTPException, status, Response
+from fastapi import HTTPException, status
 from ..models import promotion as model
 from ..schemas import promotion as schema
 from sqlalchemy.exc import SQLAlchemyError
+
 
 def create(db: Session, promotion: schema.PromotionCreate):
     if db.query(model.Promotion).filter(model.Promotion.code == promotion.code).first() is not None:
@@ -14,6 +15,7 @@ def create(db: Session, promotion: schema.PromotionCreate):
     db.commit()
     db.refresh(db_promotion)
     return db_promotion
+
 
 def read_all(db: Session):
     promotions = db.query(model.Promotion).all()
@@ -28,6 +30,7 @@ def read_one(db: Session, promotion_code: str):
     if db_promotion and not db_promotion.check_expiration():
         return None  # Expired promotion
     return db_promotion
+
 
 def update(db: Session, promotion_code, request):
     try:
