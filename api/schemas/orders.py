@@ -28,6 +28,7 @@ class OrderBase(BaseModel):
     description: Optional[str] = "No customer modifications"
     status: Optional[str] = "Received"
     type: Optional[str] = "Takeout"
+
     
 
 #data we need to create an order, that isn't in base
@@ -41,6 +42,7 @@ class OrderUpdate(BaseModel):
     description: Optional[str] = None
     status: Optional[str] = None
     type: Optional[str] = None
+    promotion_code: Optional[str] = None
     totalPrice: Optional[float] = None
 
 

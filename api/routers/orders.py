@@ -42,8 +42,20 @@ def apply_promotion_to_order(order_id: int, promotion_code: str, db: Session = D
     if not promotion or not promotion.check_expiration():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired promotion code")
 
-    # No price update, just confirm that the promotion was successfully applied
-    return {"message": "Promotion applied successfully", "promotion_code": promotion_code}
+    # Apply the promotion discount
+    if promotion.discount_percentage:
+        discount = order.totalPrice * (promotion.discount_percentage / 100)
+        order.totalPrice = round(order.totalPrice - discount, 2)
+
+    # Associate the promotion with the order
+    order.promotion_code = promotion_code
+
+    # Save the changes
+    db.commit()
+    db.refresh(order)
+
+    return order
+  
 
 
 @router.put("/{item_id}", response_model=schema.Order)
