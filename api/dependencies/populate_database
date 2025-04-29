@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from ..models.orders import Order as OrderModel
 from ..models.order_details import OrderDetail as OrderDetailModel
 from ..models.menu import MenuItem as MenuItemModel
+from ..models.recipes import Recipe as RecipeModel
+from datetime import datetime, timedelta
 from ..models.promotion import Promotion as PromotionModel
 from ..models.customer import Customer as CustomerModel
 from ..models.resources import Resource as ResourceModel
@@ -13,54 +15,61 @@ def populate_data():
     # Clear existing data
     session.query(OrderModel).delete()
     session.query(OrderDetailModel).delete()
-    #session.query(GuestOrderModel).delete()
     session.query(MenuItemModel).delete()
-    #session.query(FeedbackModel).delete()
     session.query(PromotionModel).delete()
     session.query(CustomerModel).delete()
-    #session.query(PaymentModel).delete()
     session.query(ResourceModel).delete()
 
     # Sample data
     orders = [
-        OrderModel(customer_name="John Doe", description="First order"),
-        OrderModel(customer_name="Jane Kathrin", description="Second order"),
-        OrderModel(customer_name="Alice Williams", description="Third order")
+        OrderModel(customer_name="John Doe", description="First order", status="Received", type="DineIn", totalPrice=11.98, promotion_code="HOLIDAY20"),
+        OrderModel(customer_name="Jane Kathrin", description="Second order", status="Finished", type="Takeout", totalPrice=4.99),
+        OrderModel(customer_name="Alice Williams", description="Third order", status="Served", type="Delivery", totalPrice=17.97, promotion_code="LOYALTY10")
     ]
 
     order_details = [
-        OrderDetailModel(order_id=1, sandwich_id=1, amount=2),
-        OrderDetailModel(order_id=2, sandwich_id=2, amount=1),
-        OrderDetailModel(order_id=3, sandwich_id=3, amount=3)
+        OrderDetailModel(order_id=orders[0].id, menu_item_id=menu_items[0].id, amount=2),
+        OrderDetailModel(order_id=orders[1].id, menu_item_id=menu_items[1].id, amount=1),
+        OrderDetailModel(order_id=orders[2].id, menu_item_id=menu_items[0].id, amount=3)
     ]
 
  
     menu_items = [
-        MenuItemModel(name="Ham Sandwich", ingredients="Ham, Bread, Lettuce", price=5.99, calories=250, category="Sandwich"),
+        MenuItemModel(name="Ham Sandwich",  price=5.99, calories=250, category="Sandwich"),
         MenuItemModel(name="Cheese Sandwich", ingredients="Cheese, Bread, Tomato", price=4.99, calories=200, category="Sandwich")
     ]
 
 
+    recipes = [
+        RecipeModel(menu_item_id=menu_items[0].id, resource_id=resources[0].id, amount=2),
+        RecipeModel(menu_item_id=menu_items[0].id, resource_id=resources[2].id, amount=2),
+        RecipeModel(menu_item_id=menu_items[1].id, resource_id=resources[0].id, amount=2),
+        RecipeModel(menu_item_id=menu_items[1].id, resource_id=resources[1].id, amount=2)
+    ]
+
+
     promotions = [
-        PromotionModel(code="HOLIDAY20", discount_percentage=20.0, description="Holiday Discount", is_active=1),
-        PromotionModel(code="LOYALTY10", discount_percentage=10.0, description="Loyalty Program", is_active=1)
+        PromotionModel(code="HOLIDAY20", discount_percentage=20.0, description="Holiday Discount", is_active=True, expiration=datetime.utcnow() + timedelta(days=30)),
+        PromotionModel(code="LOYALTY10", discount_percentage=10.0, description="Loyalty Program", is_active= True, expiration=datetime.utcnow() + timedelta(days=60))
     ]
 
     customers = [
-        CustomerModel(name="John Doe", email="john.doe@example.com", phone="123-456-7890", address="901 Main St"),
-        CustomerModel(name="Jane Kathrin", email="jane.smith@example.com", phone="987-654-3210", address="568 walt St")
+        CustomerModel(name="John Doe", email="john.doe@example.com", phone_number="123-456-7890", address="901 Main St", card_num="1234567812345678", card_type="Visa", is_guest=False ),
+        CustomerModel(name="Jane Kathrin", email="jane.smith@example.com", phone_number="987-654-3210", address="568 walt St", card_num="8765432187654321", card_type="MasterCard", is_guest=False)
     ]
 
 
     resources = [
         ResourceModel(name="Bread", amount=100.0, unit="kg"),
-        ResourceModel(name="Cheese", amount=50.0, unit="kg")
+        ResourceModel(name="Cheese", amount=50.0, unit="kg"),
+        ResourceModel(name="Ham", quantity=40, unit="slices")
     ]
 
     # Insert data
     session.add_all(orders)
     session.add_all(order_details)
     session.add_all(menu_items)
+    session.add_all(recipes)
     session.add_all(promotions)
     session.add_all(customers)
     session.add_all(resources)
