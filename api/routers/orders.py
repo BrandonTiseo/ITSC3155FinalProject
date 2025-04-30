@@ -66,7 +66,9 @@ def update(item_id: int, request: schema.OrderUpdate, db: Session = Depends(get_
 
 
 @router.put("/item_id/{item_id}/status/{status}", response_model=schema.Order)
-def update_status(item_id: int, status: str, db: Session = Depends(get_db)):
+def update_status(item_id: int, status: str = "Elevate", db: Session = Depends(get_db)):
+    if (not (status == "Finished" or status == "Served")):
+        status="Elevate"
     return controller.update_status(db=db, item_id=item_id, new_status=status)
 
 
