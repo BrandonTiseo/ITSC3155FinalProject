@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from ..controllers import orders as controller
 from ..schemas import orders as schema
 from ..models import orders as order_model
+from ..models import promotion as promotion_model
 from ..dependencies.database import engine, get_db
 
 
@@ -40,7 +41,8 @@ def apply_promotion_to_order(order_id: int, promotion_code: str, db: Session = D
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
 
     # Check if the promotion code exists
-    promotion = db.query(order_model.Promotion).filter(order_model.Promotion.code == promotion_code).first()
+    promotion = db.query(promotion_model.Promotion).filter(promotion_model.Promotion.code == promotion_code).first()
+    print(promotion)
     if not promotion or not promotion.check_expiration():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired promotion code")
 
