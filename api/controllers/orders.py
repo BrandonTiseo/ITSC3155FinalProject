@@ -61,7 +61,6 @@ def create(db: Session, request):
         type=request.type,
 
         #order_date=datetime.datetime.now(),
-        promotion_code=request.promotion_code,
         order_date=datetime.datetime.now()
 
     )

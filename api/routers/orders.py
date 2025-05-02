@@ -53,7 +53,6 @@ def apply_promotion_to_order(order_id: int, promotion_code: str, db: Session = D
 
     # Associate the promotion with the order
     order.promotion_code = promotion_code
-
     # Save the changes
     db.commit()
     db.refresh(order)
