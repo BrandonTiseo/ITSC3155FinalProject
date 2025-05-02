@@ -27,8 +27,10 @@ def read_all(db: Session):
 
 def read_one(db: Session, promotion_code: str):
     db_promotion = db.query(model.Promotion).filter(model.Promotion.code == promotion_code).first()
-    if db_promotion and not db_promotion.check_expiration():
-        return None  # Expired promotion
+    if not db_promotion:
+        raise HTTPException(status_code=404, detail="Promotion not found")
+    if not db_promotion.check_expiration():
+        raise HTTPException(status_code=410, detail="Promotion is expired")
     return db_promotion
 
 
