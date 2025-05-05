@@ -169,13 +169,15 @@ def delete(db: Session, item_id):
         #delete child order_details first
         details_controller.delete_by_order(db, item_id)
 
-        item = db.query(model.Order).filter(model.Order.id == item_id)
-        if not item.first():
+        item = db.query(model.Order).filter(model.Order.id == item_id).first()
+        if not item:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order id not found!")
-        item.delete(synchronize_session=False)
+        db.delete(item)
         db.commit()
+
+        return item
+    
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
